@@ -1,5 +1,5 @@
 ---
-openapi: 3.0.1
+swagger: '2.0'
 info:
   title: API V1
   version: v1
@@ -9,65 +9,65 @@ paths:
       summary: Import File
       tags:
       - Import
-      parameters: []
+      consumes:
+      - multipart/form-data
+      produces:
+      - application/json
+      parameters:
+      - name: params
+        in: formData
+        type: file
+        schema:
+          "$ref": "#/components/schemas/uploadObject"
       responses:
         '200':
           description: File Imported
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: File Imported
-                required:
-                - message
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file_report[file]:
-                  type: string
-                  format: binary
-                  nullable: false
-              required:
-              - file_report[file]
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: File Imported
+            required:
+            - message
+        '422':
+          description: invalid request
+          schema:
+            "$ref": "#/components/schemas/errors_object"
   "/api/payroll_reports":
     get:
       summary: Get all time logs
       tags:
       - Payroll Report
+      produces:
+      - application/json
       responses:
         '200':
           description: Returns result
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/payrollReportObject"
+          schema:
+            "$ref": "#/components/schemas/payrollReportObject"
   "/api/payroll_reports/{report_id}":
     get:
       summary: Get all time logs
       tags:
       - Payroll Report
+      produces:
+      - application/json
       parameters:
       - name: report_id
         in: path
+        type: string
         required: true
-        schema:
-          type: string
       responses:
         '200':
           description: Returns result
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/payrollReportObject"
+          schema:
+            "$ref": "#/components/schemas/payrollReportObject"
 servers:
 - url: http://{defaultHost}
   variables:
     defaultHost:
-      default: localhost:3000
+      default: sa-payroll.herokuapp.com
 components:
   schemas:
     errors_object:
@@ -102,3 +102,11 @@ components:
                     example: "$300.0"
       required:
       - payrollReport
+    uploadObject:
+      type: object
+      properties:
+        file_report[file]:
+          type: string
+          format: binary
+      required:
+      - file_report[file]
