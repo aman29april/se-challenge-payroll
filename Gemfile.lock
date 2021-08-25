@@ -200,7 +200,7 @@ DEPENDENCIES
   pg
   puma (~> 5.0)
   rails (~> 6.1.4)
-  rspec-rails (~> 5.0.0)
+  rspec-rails
   rswag
   rswag-specs
   spring
