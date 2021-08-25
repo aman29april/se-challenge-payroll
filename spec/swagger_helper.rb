@@ -24,15 +24,59 @@ RSpec.configure do |config|
       paths: {},
       servers: [
         {
-          url: 'https://{defaultHost}',
+          url: 'http://{defaultHost}',
           variables: {
             defaultHost: {
               # default: 'www.example.com'
-              default: 'http://localhost:3000'
+              default: 'localhost:3000'
             }
           }
         }
-      ]
+      ],
+      components:{
+        schemas: {
+          errors_object: {
+            type: 'object',
+            properties: {
+              message: { type: :string}
+            }
+          },
+          payrollReportObject: {
+            properties: {
+              payrollReport: {
+                type: :object,
+                properties: {
+                  employeeReports: {
+                    type: :array,
+                    items: {
+                      type: :object,
+                      properties: {
+                        employeeId: {
+                          type: :string,
+                          example: '1'
+                        },
+                        payPeriod: {
+                          type: :object,
+                          properties: {
+                            startDate: {
+                              type: :string, example: '2020-01-01'
+                            },
+                            endDate: {
+                              type: :string, example: '2020-01-05'
+                            },
+                          }
+                        },
+                        amountPaid: {type: :string, example: '$300.0'}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            required: ['payrollReport']
+          }
+        }
+      }
     }
   }
 

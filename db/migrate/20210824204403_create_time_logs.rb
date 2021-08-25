@@ -6,7 +6,7 @@ class CreateTimeLogs < ActiveRecord::Migration[6.1]
       t.decimal :hours_worked, null: false
       t.string :job_group, null: false
 
-      t.references :file_import, index: true, foreign_key: true
+      t.references :report, index: true, references: :file_imports, null: false, column: :report_id, primary_key: :report_id
       t.monetize :wage, null: false
 
       t.timestamps

@@ -4,11 +4,24 @@ info:
   title: API V1
   version: v1
 paths:
-  /api/file_imports:
+  "/api/file_imports":
     post:
       summary: Import File
+      tags:
+      - Import
+      parameters: []
+      responses:
+        '200':
+          description: File Imported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: File Imported
+                required:
+                - message
       requestBody:
-        required: true
         content:
           multipart/form-data:
             schema:
@@ -17,41 +30,52 @@ paths:
                 file_report[file]:
                   type: string
                   format: binary
-
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Imported
-          '422':
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: string
-                      example: "Error"
-  /api/payroll_reports:
+                  nullable: false
+              required:
+              - file_report[file]
+  "/api/payroll_reports":
     get:
-      summary: biweekly payroll report by user
-
+      summary: Get all time logs
+      tags:
+      - Payroll Report
       responses:
         '200':
-          description: OK
+          description: Returns result
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PayrollReport'
-
+                "$ref": "#/components/schemas/payrollReportObject"
+  "/api/payroll_reports/{report_id}":
+    get:
+      summary: Get all time logs
+      tags:
+      - Payroll Report
+      parameters:
+      - name: report_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns result
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/payrollReportObject"
+servers:
+- url: http://{defaultHost}
+  variables:
+    defaultHost:
+      default: localhost:3000
 components:
   schemas:
-    PayrollReport:
+    errors_object:
+      type: object
+      properties:
+        message:
+          type: string
+    payrollReportObject:
       properties:
         payrollReport:
           type: object
@@ -63,7 +87,7 @@ components:
                 properties:
                   employeeId:
                     type: string
-                    example: 1
+                    example: '1'
                   payPeriod:
                     type: object
                     properties:
@@ -72,25 +96,9 @@ components:
                         example: '2020-01-01'
                       endDate:
                         type: string
-                        example: '2020-01-15'
+                        example: '2020-01-05'
                   amountPaid:
                     type: string
-                    example: '$300.0'
-      # Both properties are required
+                    example: "$300.0"
       required:
-        - id
-        - name
-#      consumes:
-#        - multipart/form-data
-#      parameters:
-#        - in: formData
-#          name: file_report[file]
-#          type: file
-#          description: The file to upload.
-
-servers:
-- url: http://{defaultHost}
-  variables:
-    defaultHost:
-#      default: www.example.com
-      default: localhost:3000
+      - payrollReport
