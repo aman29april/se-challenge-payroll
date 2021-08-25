@@ -1,0 +1,96 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+paths:
+  /api/file_imports:
+    post:
+      summary: Import File
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file_report[file]:
+                  type: string
+                  format: binary
+
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Imported
+          '422':
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      example: "Error"
+  /api/payroll_reports:
+    get:
+      summary: biweekly payroll report by user
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayrollReport'
+
+components:
+  schemas:
+    PayrollReport:
+      properties:
+        payrollReport:
+          type: object
+          properties:
+            employeeReports:
+              type: array
+              items:
+                type: object
+                properties:
+                  employeeId:
+                    type: string
+                    example: 1
+                  payPeriod:
+                    type: object
+                    properties:
+                      startDate:
+                        type: string
+                        example: '2020-01-01'
+                      endDate:
+                        type: string
+                        example: '2020-01-15'
+                  amountPaid:
+                    type: string
+                    example: '$300.0'
+      # Both properties are required
+      required:
+        - id
+        - name
+#      consumes:
+#        - multipart/form-data
+#      parameters:
+#        - in: formData
+#          name: file_report[file]
+#          type: file
+#          description: The file to upload.
+
+servers:
+- url: http://{defaultHost}
+  variables:
+    defaultHost:
+#      default: www.example.com
+      default: localhost:3000
