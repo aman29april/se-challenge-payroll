@@ -3,13 +3,13 @@ require 'swagger_helper'
 RSpec.describe 'api/file_imports', type: :request do
   path '/api/file_imports' do
     post 'Import File' do
-      tags "Import"
-      consumes "multipart/form-data"
+      tags 'Import'
+      consumes 'multipart/form-data'
       produces 'application/json'
       parameter name: :file_report, in: :body, schema: {
         type: :object,
         properties: {
-          'file_report[file]': {type: :string, format: 'binary', nullable: false}
+          'file_report[file]': { type: :string, format: 'binary', nullable: false }
         },
         required: ['file_report[file]']
       }
@@ -19,7 +19,7 @@ RSpec.describe 'api/file_imports', type: :request do
                properties: {
                  message: 'File Imported'
                },
-               required: [ 'message' ]
+               required: ['message']
 
         run_test!
       end
@@ -32,7 +32,7 @@ RSpec.describe 'api/file_imports', type: :request do
 
   path '/api/payroll_reports' do
     get 'Get all time logs' do
-      tags "Payroll Report"
+      tags 'Payroll Report'
       produces 'application/json'
       response '200', 'Returns result' do
         schema '$ref' => '#/components/schemas/payrollReportObject'
@@ -47,13 +47,13 @@ RSpec.describe 'api/file_imports', type: :request do
 
   path '/api/payroll_reports/{report_id}' do
     get 'Get all time logs' do
-      tags "Payroll Report"
+      tags 'Payroll Report'
       produces 'application/json'
       parameter name: :report_id, in: :path, type: :string
       response '200', 'Returns result' do
         schema '$ref' => '#/components/schemas/payrollReportObject'
 
-        let(:report_id) { 42}
+        let(:report_id) { 42 }
         run_test!
       end
 
@@ -62,5 +62,4 @@ RSpec.describe 'api/file_imports', type: :request do
       end
     end
   end
-
 end

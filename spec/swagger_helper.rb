@@ -33,12 +33,12 @@ RSpec.configure do |config|
           }
         }
       ],
-      components:{
+      components: {
         schemas: {
           errors_object: {
             type: 'object',
             properties: {
-              message: { type: :string}
+              message: { type: :string }
             }
           },
           payrollReportObject: {
@@ -63,10 +63,10 @@ RSpec.configure do |config|
                             },
                             endDate: {
                               type: :string, example: '2020-01-05'
-                            },
+                            }
                           }
                         },
-                        amountPaid: {type: :string, example: '$300.0'}
+                        amountPaid: { type: :string, example: '$300.0' }
                       }
                     }
                   }
