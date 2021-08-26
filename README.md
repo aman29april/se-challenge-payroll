@@ -74,6 +74,7 @@ Table Names: `file_imports` `time_logs`
 
 | **time_logs**   |             |
 |-----------------|-------------|
+| id              | int (PK)    |
 | employee_id     | int         |
 | date            | date        |
 | hours_worked    | decimal     |
@@ -120,3 +121,5 @@ Table Names: `file_imports` `time_logs`
 * If we upload file with 0 rows, we will not abe to upload file with same name again. This behaviour can be changed as per the requirements.
 * I have `hardcoded` the `group rates` in the model itself and On CSV upload I am calculating `total wage` for each record which is getting saved into `wage_cents`field.
 * Report records are `sorted` by `employee id` and then `pay period start`. We can't pass `sort by` in the api request.
+
+> NOTE: I was getting some bundle error while running rubocop on my system. So i ran it from my another system and git commit history shows two users `Aman Kumar` and `aman29april`
