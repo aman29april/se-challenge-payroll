@@ -1,4 +1,6 @@
-module PayrollReportQuery
+class PayrollReportQuery
+
+  #If data is greater than 15, it is converted to 16 else it is converted to 01.
   FIELDS = <<~HEREDOC
     employee_id,
       sum(wage_cents) as total_wage,
@@ -10,7 +12,7 @@ module PayrollReportQuery
 
   GROUP_BY = 'GROUP BY employee_id, start_date'
 
-  ORDER_BY = 'ORDER BY start_date, employee_id'
+  ORDER_BY = 'ORDER BY employee_id, start_date'
 
   ALL_QUERY = <<~HEREDOC
     select  #{FIELDS} from time_logs
@@ -18,22 +20,9 @@ module PayrollReportQuery
       #{ORDER_BY}
   HEREDOC
 
-  def self.get_all
+  def self.get_all(transformer)
     records = ActiveRecord::Base.connection.execute(ALL_QUERY)
-    PayrollReportTransformer.transform(records)
+    transformer.transform(records)
   end
 
-  def self.filter(report_id:)
-    records = ActiveRecord::Base.connection.execute(filter_query(report_id.to_i))
-    PayrollReportTransformer.transform(records)
-  end
-
-  def self.filter_query(report_id)
-    <<~HEREDOC
-      select  #{FIELDS} from time_logs
-        where report_id = #{report_id}
-        #{GROUP_BY}
-        #{ORDER_BY}
-    HEREDOC
-  end
 end

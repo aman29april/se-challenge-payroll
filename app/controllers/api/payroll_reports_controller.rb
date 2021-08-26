@@ -1,9 +1,8 @@
 class Api::PayrollReportsController < ApplicationController
+
   def index
-    json_response({ payrollReport: PayrollReportQuery.get_all })
+    transformer = PayrollReportTransformer.new
+    json_response({ payrollReport: PayrollReportQuery.get_all(transformer) })
   end
 
-  def show
-    json_response({ payrollReport: PayrollReportQuery.filter(report_id: params[:id]) })
-  end
 end

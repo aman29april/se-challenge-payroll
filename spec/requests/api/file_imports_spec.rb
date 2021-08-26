@@ -6,12 +6,12 @@ RSpec.describe 'api/file_imports', type: :request, clean_as_group: true do
 
   path '/api/file_imports' do
     post 'Import File' do
-      tags 'Import'
+      tags 'CSV Import'
       consumes 'multipart/form-data'
       produces 'application/json'
       parameter name: :file_report, in: :formData, type: :file,
                 schema: { '$ref' => '#/components/schemas/upload_object' }
-      response '200', 'File Imported' do
+      response '201', 'File Imported' do
         schema '$ref' => '#/components/schemas/upload_success_object'
 
         let(:file_report) do
@@ -22,7 +22,7 @@ RSpec.describe 'api/file_imports', type: :request, clean_as_group: true do
         run_test!
       end
 
-      response '200', 'Import Empty File' do
+      response '201', 'Import Empty File' do
         schema '$ref' => '#/components/schemas/upload_success_object'
 
         let(:file_report) do

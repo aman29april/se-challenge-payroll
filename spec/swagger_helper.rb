@@ -39,8 +39,8 @@ RSpec.configure do |config|
       components: {
         schemas: {
           errors_object: {
+            type: :object,
             properties: {
-              type: :object,
               error: { type: :string }
             },
             required: ['error']

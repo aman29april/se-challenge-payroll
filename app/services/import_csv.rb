@@ -6,10 +6,9 @@ class ImportCsv
   def initialize(file)
     @file = file
     @csv = CSV.parse(file.read, headers: true)
-    validate
   end
 
-  def import
+  def call
     return if @error.present?
 
     ActiveRecord::Base.transaction do
@@ -21,10 +20,6 @@ class ImportCsv
     end
   rescue ActiveRecord::RecordInvalid => e
     fail!(e.message)
-  end
-
-  def validate
-    fail!('Invalid File') if @file.content_type != 'text/csv'
   end
 
   def success?

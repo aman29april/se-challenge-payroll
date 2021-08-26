@@ -4,9 +4,9 @@ class Api::FileImportsController < ApplicationController
     return json_response({ error: 'Required CSV File' }, :unprocessable_entity) if file.content_type != 'text/csv'
 
     import_svc = ImportCsv.new(file)
-    import_svc.import
+    import_svc.call
     if import_svc.success?
-      json_response({ message: 'File Imported' })
+      json_response({ message: 'File Imported'}, :created)
     else
       json_response({ error: import_svc.error }, :unprocessable_entity)
     end

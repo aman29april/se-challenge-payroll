@@ -8,21 +8,15 @@ paths:
     post:
       summary: Import File
       tags:
-      - Import
+      - CSV Import
       parameters: []
       responses:
-        '200':
-          description: File Imported
+        '201':
+          description: Import Empty File
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: File Imported
-                required:
-                - message
+                "$ref": "#/components/schemas/upload_success_object"
         '422':
           description: Same file (report id already present) uploaded again
           content:
@@ -41,7 +35,7 @@ paths:
       - Payroll Report
       responses:
         '200':
-          description: Returns result
+          description: Non empty array if there are time log entires
           content:
             application/json:
               schema:
@@ -57,7 +51,6 @@ components:
     errors_object:
       type: object
       properties:
-        type: object
         error:
           type: string
       required:
@@ -99,3 +92,11 @@ components:
           format: binary
       required:
       - file_report[file]
+    upload_success_object:
+      type: object
+      properties:
+        message:
+          type: string
+          example: File Imported
+      required:
+      - message
