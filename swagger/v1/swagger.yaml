@@ -1,5 +1,5 @@
 ---
-swagger: '2.0'
+openapi: 3.0.1
 info:
   title: API V1
   version: v1
@@ -9,79 +9,68 @@ paths:
       summary: Import File
       tags:
       - Import
-      consumes:
-      - multipart/form-data
-      produces:
-      - application/json
-      parameters:
-      - name: params
-        in: formData
-        type: file
-        schema:
-          "$ref": "#/components/schemas/uploadObject"
+      parameters: []
       responses:
         '200':
           description: File Imported
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-                example: File Imported
-            required:
-            - message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: File Imported
+                required:
+                - message
         '422':
-          description: invalid request
-          schema:
-            "$ref": "#/components/schemas/errors_object"
+          description: Same file (report id already present) uploaded again
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              "$ref": "#/components/schemas/uploadObject"
   "/api/payroll_reports":
     get:
       summary: Get all time logs
       tags:
       - Payroll Report
-      produces:
-      - application/json
       responses:
         '200':
           description: Returns result
-          schema:
-            "$ref": "#/components/schemas/payrollReportObject"
-  "/api/payroll_reports/{report_id}":
-    get:
-      summary: Get all time logs
-      tags:
-      - Payroll Report
-      produces:
-      - application/json
-      parameters:
-      - name: report_id
-        in: path
-        type: string
-        required: true
-      responses:
-        '200':
-          description: Returns result
-          schema:
-            "$ref": "#/components/schemas/payrollReportObject"
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/payrollReportObject"
 servers:
-- url: http://{defaultHost}
+- url: https://{defaultHost}
   variables:
     defaultHost:
       default: sa-payroll.herokuapp.com
+- url: http://localhost:3000
 components:
   schemas:
     errors_object:
       type: object
       properties:
-        message:
+        type: object
+        error:
           type: string
+      required:
+      - error
     payrollReportObject:
+      type: object
       properties:
         payrollReport:
           type: object
           properties:
             employeeReports:
               type: array
+              nullable: true
               items:
                 type: object
                 properties:
