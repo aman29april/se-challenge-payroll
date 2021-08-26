@@ -1,143 +1,100 @@
-# Wave Software Development Challenge
+## Wave Software Development Challenge - Payroll API
 
-Applicants for the Full-stack Developer role at Wave must
-complete the following challenge, and submit a solution prior to the onsite
-interview.
+This is API only Ruby on Rails based application solution to Wave's [se-challenge-payroll](https://github.com/wvchallenges/se-challenge-payroll) challenge. 
+This is a MVP product with minimum functionalities.
 
-The purpose of this exercise is to create something that we can work on
-together during the onsite. We do this so that you get a chance to collaborate
-with Wavers during the interview in a situation where you know something better
-than us (it's your code, after all!)
+### Live Demo
+Live demo can be found at https://sa-payroll.herokuapp.com
 
-There isn't a hard deadline for this exercise; take as long as you need to
-complete it. However, in terms of total time spent actively working on the
-challenge, we ask that you not spend more than a few hours, as we value your
-time and are happy to leave things open to discussion in the on-site interview.
+### Tech Stack
+* Ruby (3.0.2)
+* Rails (6.1.4)
+* PostgreSQL (13.3.1)
 
-Please use whatever programming language and framework you feel the most
-comfortable with.
+### Running Locally
+Make sure above requirements are fulfilled before running this application.
+Navigate to project directory and follow following commands
 
-Feel free to email [dev.careers@waveapps.com](dev.careers@waveapps.com) if you
-have any questions.
+`bundle install` will install all the required gems.
 
-## Project Description
+`rails db:setup` command will install all the required gems.
 
-Imagine that this is the early days of Wave's history, and that we are prototyping a new payroll system API. A front end (that hasn't been developed yet, but will likely be a single page application) is going to use our API to achieve two goals:
+`rails server` Rails Server will start and you can visit `localhost:3000` in your web browser.
 
+### Running Tests
+Run `rails spec` command from project folder.
+
+### Assumptions
+* Upload CSV file will be in correct format and there is no validation on csv rows.
+* If csv contains zero records, I am still saving reference of the file in the system, so another csv with same report id can't be uploaded.
+
+### Features
 1. Upload a CSV file containing data on the number of hours worked per day per employee
-1. Retrieve a report detailing how much each employee should be paid in each _pay period_
+2. Retrieve a report detailing how much each employee should be paid in each _pay period_
+3. API Docs using Swagger
+4. Validations for file format
 
-All employees are paid by the hour (there are no salaried employees.) Employees belong to one of two _job groups_ which determine their wages; job group A is paid $20/hr, and job group B is paid $30/hr. Each employee is identified by a string called an "employee id" that is globally unique in our system.
+### API End Points
+**POST /api/file_imports**
 
-Hours are tracked per employee, per day in comma-separated value files (CSV).
-Each individual CSV file is known as a "time report", and will contain:
+Replace HOST & PATH_TO_CSV in below curl requests.
 
-1. A header, denoting the columns in the sheet (`date`, `hours worked`,
-   `employee id`, `job group`)
-1. 0 or more data rows
+File name should be of the format `time-report-x.csv`,
+where `x` is the ID of the time report represented as an integer. 
+For example, `time-report-42.csv` would represent a report with an ID of `42`.
 
-In addition, the file name should be of the format `time-report-x.csv`,
-where `x` is the ID of the time report represented as an integer. For example, `time-report-42.csv` would represent a report with an ID of `42`.
+```
+curl -X POST "https://{HOST}/api/file_imports" -H  "Content-Type: multipart/form-data" -F "file_report[file]=@{PATH_TO_CSV};type=text/csv"
+```
 
-You can assume that:
+**GET /api/payroll_reports**
 
-1. Columns will always be in that order.
-1. There will always be data in each column and the number of hours worked will always be greater than 0.
-1. There will always be a well-formed header line.
-1. There will always be a well-formed file name.
+```
+curl -X GET "http://{HOST}/api/payroll_reports"
+```
 
-A sample input file named `time-report-42.csv` is included in this repo.
+### Design
+* This application is using Ruby on Rails only. It’s not a single page application and I am using rails views to render response. The application is simple and easy to use.
+* For persistence, **Postgres** is being used. We have structured data and later on, we may want to perform complex queries to generate timesheet and reports. So I choose SQL based database.
+* There is no authentication as of now. For an MVP, I wanted to build a working application with important functionalities.
+* The application is hosted on Heroku free instance and we can use some `elastic server` in case our app becomes popular and attract thousands or millions of users. Also generally we can predict peak hours as general check-in and checkout time would be at start and end of the day.
 
-### What your API must do:
+## Database Schema
+Table Names: `file_imports` `time_logs`
 
-We've agreed to build an API with the following endpoints to serve HTTP requests:
+| **file_imports** |           |
+|------------------|-----------|
+| report_id        | int(PK)   |
+| `has_many`       |`time_logs`|
 
-1. An endpoint for uploading a file.
 
-   - This file will conform to the CSV specifications outlined in the previous section.
-   - Upon upload, the timekeeping information within the file must be stored to a database for archival purposes.
-   - If an attempt is made to upload a file with the same report ID as a previously uploaded file, this upload should fail with an error message indicating that this is not allowed.
+| **time_logs**   |             |
+|-----------------|-------------|
+| employee_id     | int         |
+| date            | date        |
+| hours_worked    | decimal     |
+| job_group       | string      |
+| report_id       | int (FK)    |
+| wage_cents      | int         |
+| wage_currency   | string      |
+| `belongs_to`    |`file_import`|
 
-2. An endpoint for retrieving a payroll report structured in the following way:
+## Other Alternatives I considered
+* Having separate model for employee, payment groups
 
-   _NOTE:_ It is not the responsibility of the API to return HTML, as we will delegate the visual layout and redering to the front end. The expectation is that this API will only return JSON data.
 
-   - Return a JSON object `payrollReport`.
-   - `payrollReport` will have a single field, `employeeReports`, containing a list of objects with fields `employeeId`, `payPeriod`, and `amountPaid`.
-   - The `payPeriod` field is an object containing a date interval that is roughly biweekly. Each month has two pay periods; the _first half_ is from the 1st to the 15th inclusive, and the _second half_ is from the 16th to the end of the month, inclusive. `payPeriod` will have two fields to represent this interval: `startDate` and `endDate`.
-   - Each employee should have a single object in `employeeReports` for each pay period that they have recorded hours worked. The `amountPaid` field should contain the sum of the hours worked in that pay period multiplied by the hourly rate for their job group.
-   - If an employee was not paid in a specific pay period, there should not be an object in `employeeReports` for that employee + pay period combination.
-   - The report should be sorted in some sensical order (e.g. sorted by employee id and then pay period start.)
-   - The report should be based on all _of the data_ across _all of the uploaded time reports_, for all time.
+#### How did you test that your implementation was correct?
+I have written Test Cases using rspec and swagger.
 
-As an example, given the upload of a sample file with the following data:
+#### If this application was destined for a production environment, what would you add or change?
+* **API Authentication** - Only authenticated requests can access the system
+* Having separate models for employee, payment groups. For this we should have employees, groups already created in the system.
+* Background processing of CSV and maintain status of the job and errors if any.
+* Validation on CSV data.
+* Export report data in formats like CSV or XLS
 
-   | date       | hours worked | employee id | job group |
-   | ---------- | ------------ | ----------- | --------- |
-   | 2020-01-04 | 10           | 1           | A         |
-   | 2020-01-14 | 5            | 1           | A         |
-   | 2020-01-20 | 3            | 2           | B         |
-   | 2020-01-20 | 4            | 1           | A         |
-
-A request to the report endpoint should return the following JSON response:
-
-   ```json
-   {
-     "payrollReport": {
-       "employeeReports": [
-         {
-           "employeeId": "1",
-           "payPeriod": {
-             "startDate": "2020-01-01",
-             "endDate": "2020-01-15"
-           },
-           "amountPaid": "$300.00"
-         },
-         {
-           "employeeId": "1",
-           "payPeriod": {
-             "startDate": "2020-01-16",
-             "endDate": "2020-01-31"
-           },
-           "amountPaid": "$80.00"
-         },
-         {
-           "employeeId": "2",
-           "payPeriod": {
-             "startDate": "2020-01-16",
-             "endDate": "2020-01-31"
-           },
-           "amountPaid": "$90.00"
-         }
-       ]
-     }
-   }
-   ```
-
-We consider ourselves to be language agnostic here at Wave, so feel free to use any combination of technologies you see fit to both meet the requirements and showcase your skills. We only ask that your submission:
-
-- Is easy to set up
-- Can run on either a Linux or Mac OS X developer machine
-- Does not require any non open-source software
-
-### Documentation:
-
-Please commit the following to this `README.md`:
-
-1. Instructions on how to build/run your application
-1. Answers to the following questions:
-   - How did you test that your implementation was correct?
-   - If this application was destined for a production environment, what would you add or change?
-   - What compromises did you have to make as a result of the time constraints of this challenge?
-
-## Submission Instructions
-
-1. Clone the repository.
-1. Complete your project as described above within your local repository.
-1. Ensure everything you want to commit is committed.
-1. Create a git bundle: `git bundle create your_name.bundle --all`
-1. Email the bundle file to [dev.careers@waveapps.com](dev.careers@waveapps.com) and CC the recruiter you have been in contact with.
-
+#### What compromises did you have to make as a result of the time constraints of this challenge?
+    
 ## Evaluation
 
 Evaluation of your submission will be based on the following criteria.

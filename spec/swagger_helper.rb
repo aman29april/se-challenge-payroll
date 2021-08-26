@@ -17,6 +17,7 @@ RSpec.configure do |config|
   config.swagger_docs = {
     'v1/swagger.yaml' => {
       openapi: '3.0.1',
+      # swagger: '2.0',
       info: {
         title: 'API V1',
         version: 'v1'
@@ -24,30 +25,35 @@ RSpec.configure do |config|
       paths: {},
       servers: [
         {
-          url: 'http://{defaultHost}',
+          url: 'https://{defaultHost}',
           variables: {
             defaultHost: {
               # default: 'www.example.com'
-              default: 'localhost:3000'
+              default: 'sa-payroll.herokuapp.com'
             }
           }
+        },{
+        url: 'http://localhost:3000'
         }
       ],
       components: {
         schemas: {
           errors_object: {
-            type: 'object',
             properties: {
-              message: { type: :string }
-            }
+              type: :object,
+              error: { type: :string }
+            },
+            required: ['error']
           },
-          payrollReportObject: {
+          payroll_report_object: {
+            type: 'object',
             properties: {
               payrollReport: {
                 type: :object,
                 properties: {
                   employeeReports: {
                     type: :array,
+                    nullable: true,
                     items: {
                       type: :object,
                       properties: {
@@ -74,6 +80,13 @@ RSpec.configure do |config|
               }
             },
             required: ['payrollReport']
+          },
+          upload_object: {
+              type: :object,
+              properties: {
+                'file_report[file]': { type: :string, format: 'binary' }
+              },
+            required: ['file_report[file]']
           }
         }
       }

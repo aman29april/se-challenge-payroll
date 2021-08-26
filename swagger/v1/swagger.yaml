@@ -18,21 +18,22 @@ paths:
               schema:
                 type: object
                 properties:
-                  message: File Imported
+                  message:
+                    type: string
+                    example: File Imported
                 required:
                 - message
+        '422':
+          description: Same file (report id already present) uploaded again
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/errors_object"
       requestBody:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                file_report[file]:
-                  type: string
-                  format: binary
-                  nullable: false
-              required:
-              - file_report[file]
+              "$ref": "#/components/schemas/upload_object"
   "/api/payroll_reports":
     get:
       summary: Get all time logs
@@ -44,44 +45,32 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/payrollReportObject"
-  "/api/payroll_reports/{report_id}":
-    get:
-      summary: Get all time logs
-      tags:
-      - Payroll Report
-      parameters:
-      - name: report_id
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Returns result
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/payrollReportObject"
+                "$ref": "#/components/schemas/payroll_report_object"
 servers:
-- url: http://{defaultHost}
+- url: https://{defaultHost}
   variables:
     defaultHost:
-      default: localhost:3000
+      default: sa-payroll.herokuapp.com
+- url: http://localhost:3000
 components:
   schemas:
     errors_object:
       type: object
       properties:
-        message:
+        type: object
+        error:
           type: string
-    payrollReportObject:
+      required:
+      - error
+    payroll_report_object:
+      type: object
       properties:
         payrollReport:
           type: object
           properties:
             employeeReports:
               type: array
+              nullable: true
               items:
                 type: object
                 properties:
@@ -102,3 +91,11 @@ components:
                     example: "$300.0"
       required:
       - payrollReport
+    upload_object:
+      type: object
+      properties:
+        file_report[file]:
+          type: string
+          format: binary
+      required:
+      - file_report[file]

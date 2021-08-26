@@ -40,7 +40,7 @@ class ImportCsv
       hours_worked: hours_worked,
       employee_id: row['employee id'],
       job_group: row['job group'],
-      wage: TimeLog.group_rates[row['job group'].to_sym] * hours_worked
+      wage: (TimeLog.group_rates[row['job group'].to_sym] * hours_worked).to_money
     }
   end
 

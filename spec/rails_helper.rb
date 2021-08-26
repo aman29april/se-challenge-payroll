@@ -1,10 +1,17 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
+require 'database_cleaner/active_record'
 require 'spec_helper'
+require "rspec/json_expectations"
+
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../config/environment', __dir__)
 # Prevent database truncation if the environment is production
 abort('The Rails environment is running in production mode!') if Rails.env.production?
-require 'rspec/rails'
+
+begin
+  require 'rspec/rails'
+rescue LoadError
+end
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -61,4 +68,45 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+  #
+  # # start by truncating all the tables but then use the faster transaction strategy the rest of the time.
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :truncation
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.before(:all) do
+    # Clean before each example group if clean_as_group is set
+    if self.class.metadata[:clean_as_group]
+      DatabaseCleaner.clean
+    end
+  end
+
+  config.after(:all) do
+    # Clean after each example group if clean_as_group is set
+    if self.class.metadata[:clean_as_group]
+      DatabaseCleaner.clean
+    end
+  end
+
+  config.before(:each) do
+    # Clean before each example unless clean_as_group is set
+    unless self.class.metadata[:clean_as_group]
+      DatabaseCleaner.start
+    end
+  end
+
+  config.after(:each) do
+    # Clean before each example unless clean_as_group is set
+    unless self.class.metadata[:clean_as_group]
+      DatabaseCleaner.clean
+    end
+  end
+
+    # start the transaction strategy as examples are run
+    # config.around(:each) do |example|
+    #   DatabaseCleaner.cleaning do
+    #     example.run
+    #   end
+    # end
 end
