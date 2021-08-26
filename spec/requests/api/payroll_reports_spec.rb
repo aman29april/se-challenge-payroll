@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'json'
 
 RSpec.describe 'Api::PayrollReports', type: :request do
   let(:file_path) { "#{Rails.root}/spec/files/time-report-1.csv" }
@@ -10,7 +11,7 @@ RSpec.describe 'Api::PayrollReports', type: :request do
         tags 'Payroll Report'
         produces 'application/json'
 
-        response '200', 'Returns result' do
+        response '200', 'When there is no data, employeeReports should be empty array' do
           schema '$ref' => '#/components/schemas/payroll_report_object'
           run_test!  do |response|
             data = JSON.parse(response.body)
@@ -18,48 +19,50 @@ RSpec.describe 'Api::PayrollReports', type: :request do
           end
         end
 
-        response '200', 'Returns result' do
+        response '200', 'Non empty array if there are time log entires' do
+
+          #create some data
           before { post '/api/file_imports',
                         params: {
                           file_report: { file: file }
                         }
           }
-
           schema '$ref' => '#/components/schemas/payroll_report_object'
           run_test!  do |response|
-            data = JSON.parse(response.body)
-            employees = data['payrollReport']['employeeReports']
-            expect(employees).not_to be_empty
-            debugger
+            data = JSON.parse(response.body).deep_symbolize_keys
+            expect(data).to match(
+                                         "payrollReport": {
+                                           "employeeReports": [
+                                             {
+                                               "employeeId": "1",
+                                               "payPeriod": {
+                                                 "startDate": "2023-01-01",
+                                                 "endDate": "2023-01-15"
+                                               },
+                                               "amountPaid": "$300.00"
+                                             },
+                                             {
+                                               "employeeId": "1",
+                                               "payPeriod": {
+                                                 "startDate": "2023-01-16",
+                                                 "endDate": "2023-01-31"
+                                               },
+                                               "amountPaid": "$80.00"
+                                             },
+                                             {
+                                               "employeeId": "2",
+                                               "payPeriod": {
+                                                 "startDate": "2023-01-16",
+                                                 "endDate": "2023-01-31"
+                                               },
+                                               "amountPaid": "$90.00"
+                                             }
+                                           ]
 
-            expect()
+                                       }.deep_symbolize_keys)
           end
         end
-
-        # response 422, 'invalid request' do
-        #   schema '$ref' => '#/components/schemas/errors_object'
-        #
-        #   run_test!
-        # end
       end
     end
   end
-
-  # path '/api/payroll_reports/{report_id}' do
-  #   get 'Get all time logs' do
-  #     tags 'Payroll Report'
-  #     produces 'application/json'
-  #     parameter name: :report_id, in: :path, type: :string
-  #     response '200', 'Returns result' do
-  #       schema '$ref' => '#/components/schemas/payroll_report_object'
-  #
-  #       let(:report_id) { 42 }
-  #       run_test!
-  #     end
-  #
-  #     response 422, 'invalid request' do
-  #       schema '$ref' => '#/components/schemas/errors_object'
-  #     end
-  #   end
-  # end
 end

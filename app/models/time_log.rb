@@ -1,6 +1,5 @@
 class TimeLog < ApplicationRecord
   monetize :wage_cents
-  # validates :wage_cents, numericality: { greater_than: 0 }
 
   belongs_to :file_import, foreign_key: :report_id
 

@@ -6,8 +6,8 @@ class PayrollReportTransformer
         {
           employeeId: time_log['employee_id'].to_s,
           payPeriod: {
-            start_date: start_date,
-            end_date: get_end_date(start_date)
+            startDate: start_date,
+            endDate: get_end_date(start_date)
           },
           amountPaid: amount_string(time_log['total_wage'])
         }
@@ -20,7 +20,6 @@ class PayrollReportTransformer
   end
 
   def self.amount_string(cents)
-    money = (cents / 100).to_money
-    money.format
+    (cents / 100).to_money.format
   end
 end

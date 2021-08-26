@@ -27,6 +27,7 @@ Run `rails spec` command from project folder.
 ### Assumptions
 * Upload CSV file will be in correct format and there is no validation on csv rows.
 * If csv contains zero records, I am still saving reference of the file in the system, so another csv with same report id can't be uploaded.
+* Once CSV is uploaded, wages will be calculated based on current group rates. If in future group rates change, old entries will have wages as per previous rates.
 
 ### Features
 1. Upload a CSV file containing data on the number of hours worked per day per employee
@@ -37,7 +38,7 @@ Run `rails spec` command from project folder.
 ### API End Points
 **POST /api/file_imports**
 
-Replace HOST & PATH_TO_CSV in below curl requests.
+Replace `HOST` & `PATH_TO_CSV` in below curl requests.
 
 File name should be of the format `time-report-x.csv`,
 where `x` is the ID of the time report represented as an integer. 
@@ -54,10 +55,9 @@ curl -X GET "http://{HOST}/api/payroll_reports"
 ```
 
 ### Design
-* This application is using Ruby on Rails only. It’s not a single page application and I am using rails views to render response. The application is simple and easy to use.
+* This application API only application built using Ruby on Rails.
 * For persistence, **Postgres** is being used. We have structured data and later on, we may want to perform complex queries to generate timesheet and reports. So I choose SQL based database.
 * There is no authentication as of now. For an MVP, I wanted to build a working application with important functionalities.
-* The application is hosted on Heroku free instance and we can use some `elastic server` in case our app becomes popular and attract thousands or millions of users. Also generally we can predict peak hours as general check-in and checkout time would be at start and end of the day.
 
 ## Database Schema
 Table Names: `file_imports` `time_logs`
@@ -79,12 +79,13 @@ Table Names: `file_imports` `time_logs`
 | wage_currency   | string      |
 | `belongs_to`    |`file_import`|
 
-## Other Alternatives I considered
-* Having separate model for employee, payment groups
-
 
 #### How did you test that your implementation was correct?
-I have written Test Cases using rspec and swagger.
+* I have written Test Cases using rspec and swagger.
+* Also used Swagger UI to manually verify the functionalities.  
+* Specs verify following functionalities
+   * If data is getting imported into database with valid CSV
+   * API response of GET Payroll Report matches expected result.
 
 #### If this application was destined for a production environment, what would you add or change?
 * **API Authentication** - Only authenticated requests can access the system
@@ -92,11 +93,17 @@ I have written Test Cases using rspec and swagger.
 * Background processing of CSV and maintain status of the job and errors if any.
 * Validation on CSV data.
 * Export report data in formats like CSV or XLS
+* Pagination of results
+* Filters based on date, employee id, group
+* Sorting options based on employee id, wage, duration
 
 #### What compromises did you have to make as a result of the time constraints of this challenge?
-    
-## Evaluation
+* For generation of Payroll Report, I am querying Time Log table and grouping the records. 
+  Instead we can have Payroll Report table and on data import, processed data to Payroll Report table can also saved. Also this will depend on the usage of Payroll Report data.    
+* If we upload file with 0 rows, we will not abe to upload file with same name again. This behaviour can be changed as per the requirements.
+* I have hardcoded the group rates in the model itself and On CSV upload I am calculating total wage for each record and persisting it to DB.
 
+## Evaluation
 Evaluation of your submission will be based on the following criteria.
 
 1. Did you follow the instructions for submission?

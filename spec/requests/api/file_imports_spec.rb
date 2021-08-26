@@ -11,15 +11,22 @@ RSpec.describe 'api/file_imports', type: :request, clean_as_group: true do
       produces 'application/json'
       parameter name: :file_report, in: :formData, type: :file, schema: {'$ref' => '#/components/schemas/upload_object'}
       response '200', 'File Imported' do
-        schema type: :object,
-               properties: {
-                 message: {type: :string, example: 'File Imported'}
-               },
-               required: ['message']
+        schema '$ref' => '#/components/schemas/upload_success_object'
 
         let(:file_report){
           {
             file: file,
+          }
+        }
+        run_test!
+      end
+
+      response '200', 'Import Empty File' do
+        schema '$ref' => '#/components/schemas/upload_success_object'
+
+        let(:file_report){
+          {
+            file: fixture_file_upload("#{Rails.root}/spec/files/time-report-2.csv", 'text/csv', binary: true),
           }
         }
         run_test!

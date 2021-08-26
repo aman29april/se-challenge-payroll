@@ -87,6 +87,13 @@ RSpec.configure do |config|
                 'file_report[file]': { type: :string, format: 'binary' }
               },
             required: ['file_report[file]']
+          },
+          upload_success_object: {
+            type: :object,
+            properties: {
+              message: {type: :string, example: 'File Imported'}
+            },
+            required: ['message']
           }
         }
       }
