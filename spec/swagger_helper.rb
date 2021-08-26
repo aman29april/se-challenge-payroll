@@ -39,14 +39,13 @@ RSpec.configure do |config|
       components: {
         schemas: {
           errors_object: {
-            type: 'object',
             properties: {
               type: :object,
               error: { type: :string }
             },
             required: ['error']
           },
-          payrollReportObject: {
+          payroll_report_object: {
             type: 'object',
             properties: {
               payrollReport: {
@@ -82,7 +81,7 @@ RSpec.configure do |config|
             },
             required: ['payrollReport']
           },
-          uploadObject: {
+          upload_object: {
               type: :object,
               properties: {
                 'file_report[file]': { type: :string, format: 'binary' }

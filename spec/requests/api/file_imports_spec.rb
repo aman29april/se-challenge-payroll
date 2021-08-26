@@ -1,7 +1,7 @@
 require 'swagger_helper'
 
 RSpec.describe 'api/file_imports', type: :request, clean_as_group: true do
-  let(:file_path) { "#{Rails.root}/spec/files/time-report-42.csv" }
+  let(:file_path) { "#{Rails.root}/spec/files/time-report-1.csv" }
   let(:file) {fixture_file_upload(file_path, 'text/csv', binary: true)}
 
   path '/api/file_imports' do
@@ -9,8 +9,7 @@ RSpec.describe 'api/file_imports', type: :request, clean_as_group: true do
       tags 'Import'
       consumes 'multipart/form-data'
       produces 'application/json'
-      # parameter name: 'file_report[:file]', in: :formData, type: :file
-      parameter name: :file_report, in: :formData, type: :file, schema: {'$ref' => '#/components/schemas/uploadObject'}
+      parameter name: :file_report, in: :formData, type: :file, schema: {'$ref' => '#/components/schemas/upload_object'}
       response '200', 'File Imported' do
         schema type: :object,
                properties: {

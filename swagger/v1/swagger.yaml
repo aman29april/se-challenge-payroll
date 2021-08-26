@@ -33,7 +33,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              "$ref": "#/components/schemas/uploadObject"
+              "$ref": "#/components/schemas/upload_object"
   "/api/payroll_reports":
     get:
       summary: Get all time logs
@@ -45,7 +45,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/payrollReportObject"
+                "$ref": "#/components/schemas/payroll_report_object"
 servers:
 - url: https://{defaultHost}
   variables:
@@ -62,7 +62,7 @@ components:
           type: string
       required:
       - error
-    payrollReportObject:
+    payroll_report_object:
       type: object
       properties:
         payrollReport:
@@ -91,7 +91,7 @@ components:
                     example: "$300.0"
       required:
       - payrollReport
-    uploadObject:
+    upload_object:
       type: object
       properties:
         file_report[file]:
