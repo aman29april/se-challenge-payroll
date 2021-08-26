@@ -32,8 +32,8 @@ RSpec.configure do |config|
               default: 'sa-payroll.herokuapp.com'
             }
           }
-        },{
-        url: 'http://localhost:3000'
+        }, {
+          url: 'http://localhost:3000'
         }
       ],
       components: {
@@ -82,16 +82,16 @@ RSpec.configure do |config|
             required: ['payrollReport']
           },
           upload_object: {
-              type: :object,
-              properties: {
-                'file_report[file]': { type: :string, format: 'binary' }
-              },
+            type: :object,
+            properties: {
+              'file_report[file]': { type: :string, format: 'binary' }
+            },
             required: ['file_report[file]']
           },
           upload_success_object: {
             type: :object,
             properties: {
-              message: {type: :string, example: 'File Imported'}
+              message: { type: :string, example: 'File Imported' }
             },
             required: ['message']
           }

@@ -77,36 +77,28 @@ RSpec.configure do |config|
 
   config.before(:all) do
     # Clean before each example group if clean_as_group is set
-    if self.class.metadata[:clean_as_group]
-      DatabaseCleaner.clean
-    end
+    DatabaseCleaner.clean if self.class.metadata[:clean_as_group]
   end
 
   config.after(:all) do
     # Clean after each example group if clean_as_group is set
-    if self.class.metadata[:clean_as_group]
-      DatabaseCleaner.clean
-    end
+    DatabaseCleaner.clean if self.class.metadata[:clean_as_group]
   end
 
   config.before(:each) do
     # Clean before each example unless clean_as_group is set
-    unless self.class.metadata[:clean_as_group]
-      DatabaseCleaner.start
-    end
+    DatabaseCleaner.start unless self.class.metadata[:clean_as_group]
   end
 
   config.after(:each) do
     # Clean before each example unless clean_as_group is set
-    unless self.class.metadata[:clean_as_group]
-      DatabaseCleaner.clean
-    end
+    DatabaseCleaner.clean unless self.class.metadata[:clean_as_group]
   end
 
-    # start the transaction strategy as examples are run
-    # config.around(:each) do |example|
-    #   DatabaseCleaner.cleaning do
-    #     example.run
-    #   end
-    # end
+  # start the transaction strategy as examples are run
+  # config.around(:each) do |example|
+  #   DatabaseCleaner.cleaning do
+  #     example.run
+  #   end
+  # end
 end
